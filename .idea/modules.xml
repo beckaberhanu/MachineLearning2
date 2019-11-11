@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Machine Learning 2.iml" filepath="$PROJECT_DIR$/Machine Learning 2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../MachineLearning/MachineLearning.iml" filepath="$PROJECT_DIR$/../MachineLearning/MachineLearning.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../ImageProcessing/Triangulator/Triangulator.iml" filepath="$PROJECT_DIR$/../ImageProcessing/Triangulator/Triangulator.iml" />
+    </modules>
+  </component>
+</project>
