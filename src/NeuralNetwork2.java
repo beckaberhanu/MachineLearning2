@@ -1,6 +1,8 @@
+import org.knowm.xchart.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Random;
+
 
 public class NeuralNetwork2 {
     Matrix2d [] data;
@@ -8,6 +10,7 @@ public class NeuralNetwork2 {
     Matrix2d [] weights;
     double lR;
     boolean bias;
+    double [][] lossHistory;
     public NeuralNetwork2(int [] arr, double learningRate, boolean bias, String dataDirectory, String labelDirectory) throws IOException {
         /*
         Initializes the neural network and imports its learning data and labels from a local directory. This Initializer only works
@@ -167,11 +170,14 @@ public class NeuralNetwork2 {
             epoch -> number of times to train the model on the same data
             freq -> Integer specifying frequency of feedback
          */
+        lossHistory = new double[2][epoch];
         int limit = data.length - (int)(data.length/(1+ratio));//represent the boundary for the portion of the data dedicated to training.
         for(int j = 0; j<epoch; j++) {
             if (j % freq == 0) { // gives feedback on the models loss from at the beginning of some epoch. The frequency of the feedback is determined by the variable "freq"
                 System.out.println("epoch = " + j + " || loss = " + report(limit));
             }
+            lossHistory[0][j] = report(limit);
+            lossHistory[1][j] = j;
             for (int i = 0; i < limit; i++) {
 //            for (int i = 10000; i < 60000; i++) {
                 fitPartial(data[i], labels[i]); //fits the model to a single data point from our training data.
@@ -179,7 +185,7 @@ public class NeuralNetwork2 {
 
         }
     }
-    public String report(int limit){ // name of function could use an improvement. "report" is too general
+    public double report(int limit){ // name of function could use an improvement. "report" is too general
         /*
             This function, when called gives feedback on the average loss of a model over 50 randomly selected data points in the testing set.
             limit -> integer representing the lower boundary of the testing set
@@ -194,7 +200,7 @@ public class NeuralNetwork2 {
             sum += MatricOpr.sumAll(MatricOpr.abs(loss))/loss.xSpan; // calculating the average loss over each node in the output layer and adding it to an accumulator.
         }
         sum = sum/50; // finds the average loss over the 50 random data points.
-        return (Double.toString(sum)); // returns the average loss as a string
+        return sum; // returns the average loss as a string
     }
 
     public void fitPartial(Matrix2d digit, Matrix2d label){ // Name the parameter "digit" differently. Its too specific to numbers.
@@ -378,8 +384,12 @@ public class NeuralNetwork2 {
         return null;
     }
 
+    public double[][] getLossHistory() {
+        return lossHistory;
+    }
+
     public static void main(String[] args) throws IOException{
-        String resDir = "/Users/beckaberhanu/Desktop/Academic/College/Activities/Personal Projects/Machine Learning 2/res";
+        String resDir = "/Users/bgeleto/Documents/IdeaProjects/MachineLearning2/res";
         String dataFilePath = resDir + "/train-images-idx3-ubyte (1)";
         String labelFilePath = resDir + "/train-labels-idx1-ubyte";
         Matrix2d[] data = MNISTDataReader2.loadData(dataFilePath);
@@ -406,46 +416,9 @@ public class NeuralNetwork2 {
         //System.out.println("target to actual Table \n"+brain.ttaTable);
         System.out.println("*********************************************************************************************************************");
 
-//        System.out.println("prediction:" +MatricOpr.normalize(brain.predict(data[51000])));
-//        System.out.println("target:" + labels[51000]);
-//        int count1 = 0;
-//        int count2 = 0;
-//        ArrayList<Integer> wrong = new ArrayList<>();
-//        for(int i = 0; i<100; i++){
-//            System.out.print("index: "+i+" prediction = " + simplify(brain.predict(data[i])) + " || expectation = " + simplify(labels[i]));
-//            if(simplify(brain.predict(data[i]))==simplify(labels[i])){
-//                if(i<50){
-//                    count1 +=1;
-//                }
-//                else{
-//                    count2 +=1;
-//                }
-//
-//            }
-//            else{
-//                System.out.println("*****************************************");
-//                System.out.print(brain.predict(data[i]));
-//                wrong.add(i);
-//                System.out.print("*******************************************************************************************");
-//            }
-//            System.out.print("\n");
-//        }
-//
-//        Matrix2d[] data2 = MNISTDataReader2.loadData(dataFilePath);
-//        MNISTDataReader2.resizeArray(data2,15,15);
-//        System.out.println("Training Set performance: " + count1 + " Testing Set performance: " + count2);
-//        Scanner scan = new Scanner(System.in);
-//        ImageAs3DArray img1 = new ImageAs3DArray();
-//        for(int i: wrong){
-//            int[][][] pic = data2[i].to3dArray();
-//            System.out.println("please click enter to continue");
-//            String x = scan.nextLine();
-//            System.out.println("detected");
-//            System.out.println("index: "+i);
-//            System.out.println("pre-->"+simplify(brain.predict(data[i])));
-//            System.out.println("exp-->"+simplify(labels[i]));
-//            img1.displayImage(ImageAs3DArray.convertToImage(ImageAs3DArray.arrayResize(pic,400,400)));
-//
-//        }
+        final XYChart chart = QuickChart.getChart("Simple XChart Real-time Demo", "Epoch", "Loss", "loss", brain.getLossHistory()[1], brain.getLossHistory()[0]);
+        // Show it
+        final SwingWrapper<XYChart> sw = new SwingWrapper<XYChart>(chart);
+        sw.displayChart();
     }
 }
